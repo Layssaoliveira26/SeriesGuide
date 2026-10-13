@@ -4,10 +4,10 @@
 package com.battlelancer.seriesguide.util.tasks
 
 import android.content.Context
-import com.battlelancer.seriesguide.SgApp
-import com.battlelancer.seriesguide.traktapi.TraktTools4
-import com.battlelancer.seriesguide.traktapi.TraktTools4.TraktNonNullResponse
-import com.uwetrottmann.trakt5.entities.SyncResponse
+import com.battlelancer.seriesguide.services.adapter.TraktServiceAdapter
+import com.battlelancer.seriesguide.services.models.ErrorType
+import com.battlelancer.seriesguide.services.models.ServiceResult
+import com.battlelancer.seriesguide.services.models.SyncResponse
 import org.greenrobot.eventbus.EventBus
 
 abstract class BaseShowActionTask(
@@ -22,17 +22,15 @@ abstract class BaseShowActionTask(
 
     override suspend fun doBackgroundAction(): Int {
         if (isSendingToTrakt) {
-            val trakt = SgApp.getServicesComponent(context).trakt()
-            val traktTools = TraktTools4(trakt)
-
-            val result = trakt.awaitAndHandleAuthErrorNonNull {
-                sendToTrakt(traktTools)
-            }.toActionResult {
-                // If show was not found on Trakt
-                if (TraktTools4.isNotFound(it)) ERROR_TRAKT_API_NOT_FOUND else SUCCESS
-            }
-            if (result != SUCCESS) {
-                return result
+            val result = sendToService(TraktServiceAdapter.create(context))
+            if (!result.success) {
+                return when (result.error) {
+                    ErrorType.UNAUTHORIZED -> ERROR_TRAKT_AUTH
+                    ErrorType.NOT_FOUND -> ERROR_TRAKT_API_NOT_FOUND
+                    ErrorType.ACCOUNT_LOCKED -> ERROR_TRAKT_ACCOUNT_LOCKED
+                    ErrorType.RATE_LIMIT -> ERROR_TRAKT_ACCOUNT_LIMIT_EXCEEDED
+                    else -> ERROR_TRAKT_API_CLIENT
+                }
             }
         }
 
@@ -47,6 +45,8 @@ abstract class BaseShowActionTask(
         }
     }
 
-    protected abstract suspend fun sendToTrakt(traktTools: TraktTools4): TraktNonNullResponse<SyncResponse>
+    protected abstract suspend fun sendToService(
+        service: TraktServiceAdapter
+    ): ServiceResult<SyncResponse>
 
 }

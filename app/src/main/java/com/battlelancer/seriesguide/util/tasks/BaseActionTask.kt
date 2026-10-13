@@ -9,8 +9,6 @@ import com.battlelancer.seriesguide.R
 import com.battlelancer.seriesguide.SgApp
 import com.battlelancer.seriesguide.backend.settings.HexagonSettings
 import com.battlelancer.seriesguide.traktapi.TraktCredentials
-import com.battlelancer.seriesguide.traktapi.TraktTools4.TraktErrorResponse
-import com.battlelancer.seriesguide.traktapi.TraktTools4.TraktNonNullResponse
 import com.battlelancer.seriesguide.ui.BaseMessageActivity.ServiceActiveEvent
 import com.battlelancer.seriesguide.ui.BaseMessageActivity.ServiceCompletedEvent
 import com.battlelancer.seriesguide.util.TaskManager
@@ -91,19 +89,6 @@ abstract class BaseActionTask(context: Context) {
 
     protected abstract suspend fun doBackgroundAction(): Int
 
-    /**
-     * Maps a Trakt response to a result of [doBackgroundAction]. On success, returns the result of
-     * [onSuccess].
-     */
-    protected fun <T> TraktNonNullResponse<T>.toActionResult(onSuccess: (T) -> Int): Int =
-        when (this) {
-            is TraktNonNullResponse.Success -> onSuccess(data)
-            is TraktErrorResponse.IsUnauthorized -> ERROR_TRAKT_AUTH
-            is TraktErrorResponse.IsAccountLimitExceeded -> ERROR_TRAKT_ACCOUNT_LIMIT_EXCEEDED
-            is TraktErrorResponse.IsAccountLocked -> ERROR_TRAKT_ACCOUNT_LOCKED
-            is TraktErrorResponse.IsNotVip, is TraktErrorResponse.Other -> ERROR_TRAKT_API_CLIENT
-        }
-
     @CallSuper
     protected open fun onPostExecute(result: Int) {
         EventBus.getDefault().removeStickyEvent(ServiceActiveEvent::class.java)
@@ -148,7 +133,7 @@ abstract class BaseActionTask(context: Context) {
         private const val ERROR_NETWORK = -1
         const val ERROR_DATABASE: Int = -2
         const val ERROR_TRAKT_AUTH: Int = -3
-        private const val ERROR_TRAKT_API_CLIENT = -4
+        protected const val ERROR_TRAKT_API_CLIENT = -4
         const val ERROR_TRAKT_API_NOT_FOUND: Int = -5
         const val ERROR_HEXAGON_API: Int = -6
 
@@ -156,11 +141,11 @@ abstract class BaseActionTask(context: Context) {
          * Account limit exceeded (list count, item count, ...). Should currently only occur when
          * adding to watchlist.
          */
-        private const val ERROR_TRAKT_ACCOUNT_LIMIT_EXCEEDED = -8
+        protected const val ERROR_TRAKT_ACCOUNT_LIMIT_EXCEEDED = -8
 
         /**
          * Locked User Account, have the user contact Trakt support.
          */
-        private const val ERROR_TRAKT_ACCOUNT_LOCKED = -9
+        protected const val ERROR_TRAKT_ACCOUNT_LOCKED = -9
     }
 }

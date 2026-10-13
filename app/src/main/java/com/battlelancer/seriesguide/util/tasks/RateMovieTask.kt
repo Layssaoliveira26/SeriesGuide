@@ -6,9 +6,9 @@ package com.battlelancer.seriesguide.util.tasks
 import android.content.Context
 import com.battlelancer.seriesguide.movies.details.MovieDetailsFragment
 import com.battlelancer.seriesguide.provider.SgRoomDatabase
-import com.battlelancer.seriesguide.traktapi.TraktTools4
-import com.battlelancer.seriesguide.traktapi.TraktTools4.TraktNonNullResponse
-import com.uwetrottmann.trakt5.entities.SyncResponse
+import com.battlelancer.seriesguide.services.adapter.TraktServiceAdapter
+import com.battlelancer.seriesguide.services.models.ServiceResult
+import com.battlelancer.seriesguide.services.models.SyncResponse
 import com.uwetrottmann.trakt5.enums.Rating
 import org.greenrobot.eventbus.EventBus
 
@@ -26,8 +26,10 @@ class RateMovieTask(
      */
     override fun loadTraktIds(): Boolean = true
 
-    override suspend fun sendToTrakt(traktTools: TraktTools4): TraktNonNullResponse<SyncResponse> {
-        return traktTools.rateMovie(movieTmdbId, rating)
+    override suspend fun sendToService(
+        service: TraktServiceAdapter
+    ): ServiceResult<SyncResponse> {
+        return service.rateMovie(movieTmdbId, rating)
     }
 
     override fun doDatabaseUpdate(): Boolean {
