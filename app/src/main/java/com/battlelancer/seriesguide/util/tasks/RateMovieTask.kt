@@ -6,7 +6,7 @@ package com.battlelancer.seriesguide.util.tasks
 import android.content.Context
 import com.battlelancer.seriesguide.movies.details.MovieDetailsFragment
 import com.battlelancer.seriesguide.provider.SgRoomDatabase
-import com.battlelancer.seriesguide.services.adapter.TraktServiceAdapter
+import com.battlelancer.seriesguide.services.TrackingService
 import com.battlelancer.seriesguide.services.models.ServiceResult
 import com.battlelancer.seriesguide.services.models.SyncResponse
 import com.uwetrottmann.trakt5.enums.Rating
@@ -27,7 +27,7 @@ class RateMovieTask(
     override fun loadTraktIds(): Boolean = true
 
     override suspend fun sendToService(
-        service: TraktServiceAdapter
+        service: TrackingService
     ): ServiceResult<SyncResponse> {
         return service.rateMovie(movieTmdbId, rating)
     }

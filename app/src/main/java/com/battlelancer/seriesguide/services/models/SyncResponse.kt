@@ -5,6 +5,5 @@ package com.battlelancer.seriesguide.services.models
 
 data class SyncResponse(
     val added: Int = 0,
-    val deleted: Int = 0,
-    val notFound: Int = 0
+    val deleted: Int = 0
 )

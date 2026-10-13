@@ -5,7 +5,7 @@ package com.battlelancer.seriesguide.util.tasks
 
 import android.content.Context
 import com.battlelancer.seriesguide.R
-import com.battlelancer.seriesguide.services.adapter.TraktServiceAdapter
+import com.battlelancer.seriesguide.services.TrackingService
 import com.battlelancer.seriesguide.services.models.ServiceResult
 import com.battlelancer.seriesguide.services.models.SyncResponse
 
@@ -15,7 +15,7 @@ class AddShowToWatchlistTask(
 ) : BaseShowActionTask(context, showTmdbId) {
 
     override suspend fun sendToService(
-        service: TraktServiceAdapter
+        service: TrackingService
     ): ServiceResult<SyncResponse> {
         return service.addShowToWatchlist(showTmdbId)
     }

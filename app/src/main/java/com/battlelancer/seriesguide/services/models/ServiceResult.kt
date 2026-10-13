@@ -3,29 +3,16 @@
 
 package com.battlelancer.seriesguide.services.models
 
-data class ServiceResult<T>(
-    val data: T? = null,
-    val success: Boolean = false,
-    val error: ErrorType? = null
-) {
+sealed class ServiceResult<out T> {
+    data class Success<out T>(val data: T) : ServiceResult<T>()
+    data class Failure(val errorType: ErrorType) : ServiceResult<Nothing>()
+
+    val success: Boolean get() = this is Success
+    val error: ErrorType? get() = (this as? Failure)?.errorType
+
     companion object {
-        fun <T> success(data: T): ServiceResult<T> = ServiceResult(
-            data = data,
-            success = true,
-            error = null
-        )
-
-        fun <T> successEmpty(): ServiceResult<T> = ServiceResult(
-            data = null,
-            success = true,
-            error = null
-        )
-
-        fun <T> failure(error: ErrorType): ServiceResult<T> = ServiceResult(
-            data = null,
-            success = false,
-            error = error
-        )
+        fun <T> success(data: T): ServiceResult<T> = Success(data)
+        fun failure(error: ErrorType): ServiceResult<Nothing> = Failure(error)
     }
 }
 

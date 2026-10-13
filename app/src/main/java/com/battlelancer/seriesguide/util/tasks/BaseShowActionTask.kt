@@ -4,8 +4,7 @@
 package com.battlelancer.seriesguide.util.tasks
 
 import android.content.Context
-import com.battlelancer.seriesguide.services.adapter.TraktServiceAdapter
-import com.battlelancer.seriesguide.services.models.ErrorType
+import com.battlelancer.seriesguide.services.TrackingService
 import com.battlelancer.seriesguide.services.models.ServiceResult
 import com.battlelancer.seriesguide.services.models.SyncResponse
 import org.greenrobot.eventbus.EventBus
@@ -22,16 +21,7 @@ abstract class BaseShowActionTask(
 
     override suspend fun doBackgroundAction(): Int {
         if (isSendingToTrakt) {
-            val result = sendToService(TraktServiceAdapter.create(context))
-            if (!result.success) {
-                return when (result.error) {
-                    ErrorType.UNAUTHORIZED -> ERROR_TRAKT_AUTH
-                    ErrorType.NOT_FOUND -> ERROR_TRAKT_API_NOT_FOUND
-                    ErrorType.ACCOUNT_LOCKED -> ERROR_TRAKT_ACCOUNT_LOCKED
-                    ErrorType.RATE_LIMIT -> ERROR_TRAKT_ACCOUNT_LIMIT_EXCEEDED
-                    else -> ERROR_TRAKT_API_CLIENT
-                }
-            }
+            return sendToService(createService()).toActionResult()
         }
 
         return SUCCESS
@@ -46,7 +36,7 @@ abstract class BaseShowActionTask(
     }
 
     protected abstract suspend fun sendToService(
-        service: TraktServiceAdapter
+        service: TrackingService
     ): ServiceResult<SyncResponse>
 
 }

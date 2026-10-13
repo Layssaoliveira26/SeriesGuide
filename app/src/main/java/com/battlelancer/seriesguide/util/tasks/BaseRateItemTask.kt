@@ -5,8 +5,7 @@ package com.battlelancer.seriesguide.util.tasks
 
 import android.content.Context
 import com.battlelancer.seriesguide.R
-import com.battlelancer.seriesguide.services.adapter.TraktServiceAdapter
-import com.battlelancer.seriesguide.services.models.ErrorType
+import com.battlelancer.seriesguide.services.TrackingService
 import com.battlelancer.seriesguide.services.models.ServiceResult
 import com.battlelancer.seriesguide.services.models.SyncResponse
 import com.uwetrottmann.trakt5.enums.Rating
@@ -28,15 +27,9 @@ abstract class BaseRateItemTask(
         if (isSendingToTrakt) {
             if (!loadTraktIds()) return ERROR_DATABASE
 
-            val result = sendToService(TraktServiceAdapter.create(context))
-            if (!result.success) {
-                return when (result.error) {
-                    ErrorType.UNAUTHORIZED -> ERROR_TRAKT_AUTH
-                    ErrorType.NOT_FOUND -> ERROR_TRAKT_API_NOT_FOUND
-                    ErrorType.ACCOUNT_LOCKED -> ERROR_TRAKT_ACCOUNT_LOCKED
-                    ErrorType.RATE_LIMIT -> ERROR_TRAKT_ACCOUNT_LIMIT_EXCEEDED
-                    else -> ERROR_TRAKT_API_CLIENT
-                }
+            val result = sendToService(createService()).toActionResult()
+            if (result != SUCCESS) {
+                return result
             }
         }
 
@@ -60,7 +53,7 @@ abstract class BaseRateItemTask(
      * Sends the [rating] to Trakt. Only called if [loadTraktIds] was successful.
      */
     protected abstract suspend fun sendToService(
-        service: TraktServiceAdapter
+        service: TrackingService
     ): ServiceResult<SyncResponse>
 
     protected abstract fun doDatabaseUpdate(): Boolean
