@@ -5,17 +5,18 @@ package com.battlelancer.seriesguide.util.tasks
 
 import android.content.Context
 import com.battlelancer.seriesguide.R
-import com.battlelancer.seriesguide.traktapi.TraktTools4
-import com.battlelancer.seriesguide.traktapi.TraktTools4.TraktNonNullResponse
-import com.uwetrottmann.trakt5.entities.SyncResponse
+import com.battlelancer.seriesguide.services.TrackingService
+import com.battlelancer.seriesguide.services.models.ServiceResult
 
 class RemoveShowFromWatchlistTask(
     context: Context,
     showTmdbId: Int
 ) : BaseShowActionTask(context, showTmdbId) {
 
-    override suspend fun sendToTrakt(traktTools: TraktTools4): TraktNonNullResponse<SyncResponse> {
-        return traktTools.removeShowFromWatchlist(showTmdbId)
+    override suspend fun sendToService(
+        service: TrackingService
+    ): ServiceResult<Unit> {
+        return service.removeShowFromWatchlist(showTmdbId)
     }
 
     override val successTextResId: Int

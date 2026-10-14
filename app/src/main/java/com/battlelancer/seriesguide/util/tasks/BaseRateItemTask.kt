@@ -5,10 +5,8 @@ package com.battlelancer.seriesguide.util.tasks
 
 import android.content.Context
 import com.battlelancer.seriesguide.R
-import com.battlelancer.seriesguide.SgApp
-import com.battlelancer.seriesguide.traktapi.TraktTools4
-import com.battlelancer.seriesguide.traktapi.TraktTools4.TraktNonNullResponse
-import com.uwetrottmann.trakt5.entities.SyncResponse
+import com.battlelancer.seriesguide.services.TrackingService
+import com.battlelancer.seriesguide.services.models.ServiceResult
 import com.uwetrottmann.trakt5.enums.Rating
 
 /**
@@ -28,15 +26,7 @@ abstract class BaseRateItemTask(
         if (isSendingToTrakt) {
             if (!loadTraktIds()) return ERROR_DATABASE
 
-            val trakt = SgApp.getServicesComponent(context).trakt()
-            val traktTools = TraktTools4(trakt)
-
-            val result = trakt.awaitAndHandleAuthErrorNonNull {
-                sendToTrakt(traktTools)
-            }.toActionResult {
-                // If movie, show or episode was not found on Trakt
-                if (TraktTools4.isNotFound(it)) ERROR_TRAKT_API_NOT_FOUND else SUCCESS
-            }
+            val result = sendToService(createService()).toActionResult()
             if (result != SUCCESS) {
                 return result
             }
@@ -61,7 +51,9 @@ abstract class BaseRateItemTask(
     /**
      * Sends the [rating] to Trakt. Only called if [loadTraktIds] was successful.
      */
-    protected abstract suspend fun sendToTrakt(traktTools: TraktTools4): TraktNonNullResponse<SyncResponse>
+    protected abstract suspend fun sendToService(
+        service: TrackingService
+    ): ServiceResult<Unit>
 
     protected abstract fun doDatabaseUpdate(): Boolean
 }

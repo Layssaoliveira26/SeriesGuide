@@ -8,6 +8,10 @@ import androidx.annotation.CallSuper
 import com.battlelancer.seriesguide.R
 import com.battlelancer.seriesguide.SgApp
 import com.battlelancer.seriesguide.backend.settings.HexagonSettings
+import com.battlelancer.seriesguide.services.TrackingService
+import com.battlelancer.seriesguide.services.adapter.TraktServiceAdapter
+import com.battlelancer.seriesguide.services.models.ErrorType
+import com.battlelancer.seriesguide.services.models.ServiceResult
 import com.battlelancer.seriesguide.traktapi.TraktCredentials
 import com.battlelancer.seriesguide.traktapi.TraktTools4.TraktErrorResponse
 import com.battlelancer.seriesguide.traktapi.TraktTools4.TraktNonNullResponse
@@ -90,6 +94,19 @@ abstract class BaseActionTask(context: Context) {
     }
 
     protected abstract suspend fun doBackgroundAction(): Int
+
+    protected open fun createService(): TrackingService = TraktServiceAdapter.create(context)
+
+    protected fun ServiceResult<*>.toActionResult(): Int = when (this) {
+        is ServiceResult.Success -> SUCCESS
+        is ServiceResult.Failure -> when (errorType) {
+            ErrorType.UNAUTHORIZED -> ERROR_TRAKT_AUTH
+            ErrorType.NOT_FOUND -> ERROR_TRAKT_API_NOT_FOUND
+            ErrorType.ACCOUNT_LOCKED -> ERROR_TRAKT_ACCOUNT_LOCKED
+            ErrorType.RATE_LIMIT -> ERROR_TRAKT_ACCOUNT_LIMIT_EXCEEDED
+            else -> ERROR_TRAKT_API_CLIENT
+        }
+    }
 
     /**
      * Maps a Trakt response to a result of [doBackgroundAction]. On success, returns the result of
