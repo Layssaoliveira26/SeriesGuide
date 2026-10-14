@@ -86,11 +86,9 @@ class JsonExportTaskTest {
             context,
             progressListener = null,
             isFullDump = true,
-            sgShow2Helper,
-            sgSeason2Helper,
-            sgEpisode2Helper,
-            mock(SgListHelper::class.java),
-            mock(MovieHelper::class.java)
+            ShowsExportStrategy(sgShow2Helper, sgSeason2Helper, sgEpisode2Helper),
+            ListsExportStrategy(mock(SgListHelper::class.java)),
+            MoviesExportStrategy(mock(MovieHelper::class.java))
         )
 
         val exportFile = configureTestExportFile(exportTask)
@@ -349,11 +347,13 @@ class JsonExportTaskTest {
             context,
             progressListener = null,
             isFullDump = true,
-            mock(SgShow2Helper::class.java),
-            mock(SgSeason2Helper::class.java),
-            mock(SgEpisode2Helper::class.java),
-            sgListHelper,
-            mock(MovieHelper::class.java)
+            ShowsExportStrategy(
+                mock(SgShow2Helper::class.java),
+                mock(SgSeason2Helper::class.java),
+                mock(SgEpisode2Helper::class.java)
+            ),
+            ListsExportStrategy(sgListHelper),
+            MoviesExportStrategy(mock(MovieHelper::class.java))
         )
 
         val exportFile = configureTestExportFile(exportTask)
@@ -393,11 +393,13 @@ class JsonExportTaskTest {
             context,
             progressListener = null,
             isFullDump = true,
-            mock(SgShow2Helper::class.java),
-            mock(SgSeason2Helper::class.java),
-            mock(SgEpisode2Helper::class.java),
-            mock(SgListHelper::class.java),
-            movieHelper
+            ShowsExportStrategy(
+                mock(SgShow2Helper::class.java),
+                mock(SgSeason2Helper::class.java),
+                mock(SgEpisode2Helper::class.java)
+            ),
+            ListsExportStrategy(mock(SgListHelper::class.java)),
+            MoviesExportStrategy(movieHelper)
         )
 
         val exportFile = configureTestExportFile(exportTask)

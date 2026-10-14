@@ -109,11 +109,7 @@ class AutoBackupTask(
         try {
             out = FileOutputStream(backupFile)
 
-            when (type) {
-                Export.Shows -> writeJsonStreamShows(coroutineScope, out)
-                Export.Lists -> writeJsonStreamLists(coroutineScope, out)
-                Export.Movies -> writeJsonStreamMovies(coroutineScope, out)
-            }
+            writeJsonStream(coroutineScope, out, type)
         } catch (e: Exception) {
             // This also handles a coroutine CancellationException
 
