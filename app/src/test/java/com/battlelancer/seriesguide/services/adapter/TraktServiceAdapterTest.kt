@@ -62,7 +62,8 @@ class TraktServiceAdapterTest {
         assertThat(Rating.fromValue(5)).isEqualTo(Rating.MEH)
         assertThat(Rating.fromValue(8)).isEqualTo(Rating.GREAT)
         assertThat(Rating.fromValue(10)).isEqualTo(Rating.TOTALLYNINJA)
-        assertThat(Rating.fromValue(null)).isNull()
+        val nullRating: Int? = null
+        assertThat(nullRating?.let { Rating.fromValue(it) }).isNull()
         assertThat(Rating.fromValue(0)).isNull()
     }
 }

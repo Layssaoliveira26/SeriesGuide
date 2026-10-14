@@ -43,7 +43,7 @@ class TraktServiceAdapter internal constructor(
     }
 
     override suspend fun rateShow(tmdbId: Int, rating: Int?): ServiceResult<Unit> {
-        val traktRating = Rating.fromValue(rating)
+        val traktRating = rating?.let { Rating.fromValue(it) }
         return execute { traktTools.rateShow(tmdbId, traktRating) }
     }
 
@@ -53,14 +53,14 @@ class TraktServiceAdapter internal constructor(
         episodeNumber: Int,
         rating: Int?
     ): ServiceResult<Unit> {
-        val traktRating = Rating.fromValue(rating)
+        val traktRating = rating?.let { Rating.fromValue(it) }
         return execute {
             traktTools.rateEpisode(showTmdbId, seasonNumber, episodeNumber, traktRating)
         }
     }
 
     override suspend fun rateMovie(tmdbId: Int, rating: Int?): ServiceResult<Unit> {
-        val traktRating = Rating.fromValue(rating)
+        val traktRating = rating?.let { Rating.fromValue(it) }
         return execute { traktTools.rateMovie(tmdbId, traktRating) }
     }
 
